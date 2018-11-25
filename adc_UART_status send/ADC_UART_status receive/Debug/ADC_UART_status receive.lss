@@ -1,0 +1,189 @@
+
+ADC_UART_status receive.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000c0  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000114  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  00000114  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000144  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000030  00000000  00000000  00000180  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000179  00000000  00000000  000001b0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000123  00000000  00000000  00000329  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000001ba  00000000  00000000  0000044c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000044  00000000  00000000  00000608  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000203  00000000  00000000  0000064c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000013  00000000  00000000  0000084f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000020  00000000  00000000  00000862  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 3a 00 	call	0x74	; 0x74 <main>
+  64:	0c 94 5e 00 	jmp	0xbc	; 0xbc <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <_Z10usart_recev>:
+	UCSRB = 1<<RXEN;
+	UCSRC = 1<<URSEL | 1<<UPM1 | 1<<UPM0 | 1<<USBS | 1<<UCSZ1 | 1<<UCSZ0;//acessing UCSRC:ODD parity mode:2 stop bits:8-bit character size	
+}
+uint8_t usart_rece(void)
+{
+	while((UCSRA & 1<<RXC)==0);//WAIT UNTILL RECEIVING IS COMPLETE
+  6c:	5f 9b       	sbis	0x0b, 7	; 11
+  6e:	fe cf       	rjmp	.-4      	; 0x6c <_Z10usart_recev>
+	return UDR;
+  70:	8c b1       	in	r24, 0x0c	; 12
+}
+  72:	08 95       	ret
+
+00000074 <main>:
+int main(void)
+{
+	uint8_t wheel_value;
+	PORTB = 0xFF;
+  74:	8f ef       	ldi	r24, 0xFF	; 255
+  76:	88 bb       	out	0x18, r24	; 24
+		{
+			PORTB = 0xF4;//right
+		}
+		else
+		{
+			PORTB = 0xF5;//stop	wheel_value= 0x05
+  78:	d5 ef       	ldi	r29, 0xF5	; 245
+		{
+			PORTB = 0xF3;//left
+		}
+		else if (wheel_value == 0x04)
+		{
+			PORTB = 0xF4;//right
+  7a:	0f 2e       	mov	r0, r31
+  7c:	f4 ef       	ldi	r31, 0xF4	; 244
+  7e:	ff 2e       	mov	r15, r31
+  80:	f0 2d       	mov	r31, r0
+		{
+			PORTB = 0XF2;//forward
+		}
+		else if (wheel_value == 0x03)
+		{
+			PORTB = 0xF3;//left
+  82:	03 ef       	ldi	r16, 0xF3	; 243
+		{
+			PORTB = 0XF1;//BACKWARD
+		}
+		else if(wheel_value == 0x02)
+		{
+			PORTB = 0XF2;//forward
+  84:	12 ef       	ldi	r17, 0xF2	; 242
+    while (1) 
+    {
+		wheel_value = usart_rece();//assign THE RECEIVED VALUE FROM ANALOG READ PA0 to variable 'value'
+		if(wheel_value == 0x01)
+		{
+			PORTB = 0XF1;//BACKWARD
+  86:	c1 ef       	ldi	r28, 0xF1	; 241
+	uint8_t wheel_value;
+	PORTB = 0xFF;
+    /* Replace with your application code */
+    while (1) 
+    {
+		wheel_value = usart_rece();//assign THE RECEIVED VALUE FROM ANALOG READ PA0 to variable 'value'
+  88:	0e 94 36 00 	call	0x6c	; 0x6c <_Z10usart_recev>
+		if(wheel_value == 0x01)
+  8c:	81 30       	cpi	r24, 0x01	; 1
+  8e:	11 f4       	brne	.+4      	; 0x94 <main+0x20>
+		{
+			PORTB = 0XF1;//BACKWARD
+  90:	c8 bb       	out	0x18, r28	; 24
+  92:	0d c0       	rjmp	.+26     	; 0xae <main+0x3a>
+		}
+		else if(wheel_value == 0x02)
+  94:	82 30       	cpi	r24, 0x02	; 2
+  96:	11 f4       	brne	.+4      	; 0x9c <main+0x28>
+		{
+			PORTB = 0XF2;//forward
+  98:	18 bb       	out	0x18, r17	; 24
+  9a:	09 c0       	rjmp	.+18     	; 0xae <main+0x3a>
+		}
+		else if (wheel_value == 0x03)
+  9c:	83 30       	cpi	r24, 0x03	; 3
+  9e:	11 f4       	brne	.+4      	; 0xa4 <main+0x30>
+		{
+			PORTB = 0xF3;//left
+  a0:	08 bb       	out	0x18, r16	; 24
+  a2:	05 c0       	rjmp	.+10     	; 0xae <main+0x3a>
+		}
+		else if (wheel_value == 0x04)
+  a4:	84 30       	cpi	r24, 0x04	; 4
+  a6:	11 f4       	brne	.+4      	; 0xac <main+0x38>
+		{
+			PORTB = 0xF4;//right
+  a8:	f8 ba       	out	0x18, r15	; 24
+  aa:	01 c0       	rjmp	.+2      	; 0xae <main+0x3a>
+		}
+		else
+		{
+			PORTB = 0xF5;//stop	wheel_value= 0x05
+  ac:	d8 bb       	out	0x18, r29	; 24
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  ae:	87 e8       	ldi	r24, 0x87	; 135
+  b0:	93 e1       	ldi	r25, 0x13	; 19
+  b2:	01 97       	sbiw	r24, 0x01	; 1
+  b4:	f1 f7       	brne	.-4      	; 0xb2 <main+0x3e>
+  b6:	00 c0       	rjmp	.+0      	; 0xb8 <main+0x44>
+  b8:	00 00       	nop
+  ba:	e6 cf       	rjmp	.-52     	; 0x88 <main+0x14>
+
+000000bc <_exit>:
+  bc:	f8 94       	cli
+
+000000be <__stop_program>:
+  be:	ff cf       	rjmp	.-2      	; 0xbe <__stop_program>

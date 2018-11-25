@@ -1,0 +1,241 @@
+
+adc_from_joystick_led_out.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000ea  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  0000013e  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  0000013e  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000170  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000038  00000000  00000000  000001ac  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   0000015f  00000000  00000000  000001e4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000000b9  00000000  00000000  00000343  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000001a1  00000000  00000000  000003fc  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000054  00000000  00000000  000005a0  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000001f9  00000000  00000000  000005f4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000048  00000000  00000000  000007ed  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000028  00000000  00000000  00000835  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 48 00 	call	0x90	; 0x90 <main>
+  64:	0c 94 73 00 	jmp	0xe6	; 0xe6 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <_Z8adc_initv>:
+#include <util/delay.h>
+
+//enable ADC
+void adc_init(void)
+{
+	ADMUX |= 1<<REFS0;//AVCC as VREF
+  6c:	3e 9a       	sbi	0x07, 6	; 7
+	ADCSRA |= 1<<ADEN | 1<<ADPS0 | 1<<ADPS1;//PRESCALING 8 FOR 125KhZ AND ADC ENABLE
+  6e:	86 b1       	in	r24, 0x06	; 6
+  70:	83 68       	ori	r24, 0x83	; 131
+  72:	86 b9       	out	0x06, r24	; 6
+  74:	08 95       	ret
+
+00000076 <_Z16analog_read_ADC0v>:
+//read analog value from ADC0 and then converts to 10 bit digital
+uint16_t analog_read_ADC0(void)
+{
+			//READING ADC0
+                uint16_t result;
+				ADCSRA |=1<<ADSC;//START CONVERSION
+  76:	36 9a       	sbi	0x06, 6	; 6
+				while(ADCSRA & 1<<ADSC);//WAIT UNTIL CONVERSION
+  78:	36 99       	sbic	0x06, 6	; 6
+  7a:	fe cf       	rjmp	.-4      	; 0x78 <_Z16analog_read_ADC0v+0x2>
+				result = ADC;
+  7c:	84 b1       	in	r24, 0x04	; 4
+  7e:	95 b1       	in	r25, 0x05	; 5
+				return (result);    
+			    ADC = 0;
+				result = 0;
+}
+  80:	08 95       	ret
+
+00000082 <_Z16analog_read_ADC1v>:
+uint16_t analog_read_ADC1(void)
+{
+	uint16_t result;
+	ADMUX |= 1<<MUX0 ;
+  82:	38 9a       	sbi	0x07, 0	; 7
+	ADCSRA |=1<<ADSC;//START CONVERSION
+  84:	36 9a       	sbi	0x06, 6	; 6
+	while(ADCSRA & 1<<ADSC);//WAIT UNTIL CONVERSION
+  86:	36 99       	sbic	0x06, 6	; 6
+  88:	fe cf       	rjmp	.-4      	; 0x86 <_Z16analog_read_ADC1v+0x4>
+	result = ADC;
+  8a:	84 b1       	in	r24, 0x04	; 4
+  8c:	95 b1       	in	r25, 0x05	; 5
+	return (result);
+	ADC = 0;
+	result = 0;
+}
+  8e:	08 95       	ret
+
+00000090 <main>:
+int main(void)
+{
+	uint16_t result1;
+	uint16_t result2;
+	
+	DDRA = 0X00;
+  90:	1a ba       	out	0x1a, r1	; 26
+	DDRB = 0XFF;
+  92:	8f ef       	ldi	r24, 0xFF	; 255
+  94:	87 bb       	out	0x17, r24	; 23
+	DDRC = 0x00;
+  96:	14 ba       	out	0x14, r1	; 20
+	DDRD = 0x00;
+  98:	11 ba       	out	0x11, r1	; 17
+	PORTB = 0X00;
+  9a:	18 ba       	out	0x18, r1	; 24
+	adc_init();
+  9c:	0e 94 36 00 	call	0x6c	; 0x6c <_Z8adc_initv>
+		            {
+			            PORTB = 1<<PINB2;
+		            }
+		            else
+		            {
+			            PORTB = 1<<PINB1;
+  a0:	12 e0       	ldi	r17, 0x02	; 2
+		            {
+			            PORTB = 1<<PINB0;
+		            }
+		            else if(result1 > 700)
+		            {
+			            PORTB = 1<<PINB2;
+  a2:	d4 e0       	ldi	r29, 0x04	; 4
+    while (1) 
+    {
+		            result1 = analog_read_ADC0() ;
+		            if(result1 < 462)
+		            {
+			            PORTB = 1<<PINB0;
+  a4:	c1 e0       	ldi	r28, 0x01	; 1
+	DDRD = 0x00;
+	PORTB = 0X00;
+	adc_init();
+    while (1) 
+    {
+		            result1 = analog_read_ADC0() ;
+  a6:	0e 94 3b 00 	call	0x76	; 0x76 <_Z16analog_read_ADC0v>
+		            if(result1 < 462)
+  aa:	8e 3c       	cpi	r24, 0xCE	; 206
+  ac:	21 e0       	ldi	r18, 0x01	; 1
+  ae:	92 07       	cpc	r25, r18
+  b0:	10 f4       	brcc	.+4      	; 0xb6 <main+0x26>
+		            {
+			            PORTB = 1<<PINB0;
+  b2:	c8 bb       	out	0x18, r28	; 24
+  b4:	06 c0       	rjmp	.+12     	; 0xc2 <main+0x32>
+		            }
+		            else if(result1 > 700)
+  b6:	8d 3b       	cpi	r24, 0xBD	; 189
+  b8:	92 40       	sbci	r25, 0x02	; 2
+  ba:	10 f0       	brcs	.+4      	; 0xc0 <main+0x30>
+		            {
+			            PORTB = 1<<PINB2;
+  bc:	d8 bb       	out	0x18, r29	; 24
+  be:	01 c0       	rjmp	.+2      	; 0xc2 <main+0x32>
+		            }
+		            else
+		            {
+			            PORTB = 1<<PINB1;
+  c0:	18 bb       	out	0x18, r17	; 24
+		            }
+		            result1 = 0x00;
+		           
+					result2 = analog_read_ADC1();
+  c2:	0e 94 41 00 	call	0x82	; 0x82 <_Z16analog_read_ADC1v>
+							 if (result2 < 462)
+  c6:	8e 3c       	cpi	r24, 0xCE	; 206
+  c8:	21 e0       	ldi	r18, 0x01	; 1
+  ca:	92 07       	cpc	r25, r18
+  cc:	10 f4       	brcc	.+4      	; 0xd2 <main+0x42>
+							 {
+								 PORTB |= 1<<PINB3;	
+  ce:	c3 9a       	sbi	0x18, 3	; 24
+  d0:	06 c0       	rjmp	.+12     	; 0xde <main+0x4e>
+							 }
+							 else if (result2 > 700)
+  d2:	8d 3b       	cpi	r24, 0xBD	; 189
+  d4:	92 40       	sbci	r25, 0x02	; 2
+  d6:	10 f0       	brcs	.+4      	; 0xdc <main+0x4c>
+							 {
+								 PORTB |= 1<<PINB5;	 
+  d8:	c5 9a       	sbi	0x18, 5	; 24
+  da:	01 c0       	rjmp	.+2      	; 0xde <main+0x4e>
+							 }
+							 else
+							 {
+							     PORTB |= 1<<PINB4;	
+  dc:	c4 9a       	sbi	0x18, 4	; 24
+							 }
+							 result2 = 0x00;					 
+			          	  	
+				
+				 ADMUX &= 1<<REFS0;
+  de:	87 b1       	in	r24, 0x07	; 7
+  e0:	80 74       	andi	r24, 0x40	; 64
+  e2:	87 b9       	out	0x07, r24	; 7
+				  I put my dick in that pussy so hard and rubbed the dick at very very high frequency that bloody pussy hole is so 
+				  fuuuucccckkkkkkeeeeeeedddddd now.Its bleeding,,,i took my revenge,,that pussy is never gonna dare to think about my dick . 
+				  Ahhhhh,,,Ahhhhhh,,,mAJJA AYO  relimai,, 
+				   */
+											   
+      }
+  e4:	e0 cf       	rjmp	.-64     	; 0xa6 <main+0x16>
+
+000000e6 <_exit>:
+  e6:	f8 94       	cli
+
+000000e8 <__stop_program>:
+  e8:	ff cf       	rjmp	.-2      	; 0xe8 <__stop_program>

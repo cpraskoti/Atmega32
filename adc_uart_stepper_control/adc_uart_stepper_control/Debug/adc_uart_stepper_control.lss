@@ -1,0 +1,246 @@
+
+adc_uart_stepper_control.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000010e  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000162  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  00000162  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000194  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000050  00000000  00000000  000001d0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000261  00000000  00000000  00000220  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000129  00000000  00000000  00000481  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000001fd  00000000  00000000  000005aa  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000084  00000000  00000000  000007a8  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000285  00000000  00000000  0000082c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000000e6  00000000  00000000  00000ab1  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000040  00000000  00000000  00000b97  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 7d 00 	call	0xfa	; 0xfa <main>
+  64:	0c 94 85 00 	jmp	0x10a	; 0x10a <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <_Z10usart_initv>:
+	while((UCSRA & 1<<UDRE)==0);
+	UDR = data;//UPLOAD THE SENDING DATA IN BUFFER
+}
+void adc_enable(void)
+{
+	ADCSRA = 1<<ADEN | 1<<ADPS1;//ADC PRESCALING 4 AND enable ADC
+  6c:	10 bc       	out	0x20, r1	; 32
+  6e:	8b e2       	ldi	r24, 0x2B	; 43
+  70:	89 b9       	out	0x09, r24	; 9
+  72:	88 e0       	ldi	r24, 0x08	; 8
+  74:	8a b9       	out	0x0a, r24	; 10
+  76:	8e eb       	ldi	r24, 0xBE	; 190
+  78:	80 bd       	out	0x20, r24	; 32
+  7a:	08 95       	ret
+
+0000007c <_Z11usart_transh>:
+  7c:	5d 9b       	sbis	0x0b, 5	; 11
+  7e:	fe cf       	rjmp	.-4      	; 0x7c <_Z11usart_transh>
+  80:	8c b9       	out	0x0c, r24	; 12
+  82:	08 95       	ret
+
+00000084 <_Z13analog_read_2v>:
+//READING ANALOG VALUE FROM ADC2
+uint16_t analog_read_2(void)
+{
+	uint8_t result;
+	
+	ADMUX = 1 <<REFS0 | 0<<MUX0 | 1<<MUX1 | 0<<MUX2 | 0<<MUX3 | 0<<MUX4;
+  84:	82 e4       	ldi	r24, 0x42	; 66
+  86:	87 b9       	out	0x07, r24	; 7
+	ADCSRA |=1<<ADSC;//START CONVERSION
+  88:	36 9a       	sbi	0x06, 6	; 6
+	while(ADCSRA & 1<<ADSC);//WAIT UNTIL CONVERSION
+  8a:	36 99       	sbic	0x06, 6	; 6
+  8c:	fe cf       	rjmp	.-4      	; 0x8a <_Z13analog_read_2v+0x6>
+	result = ADCW;//converion from 10-bit to the 8 bit data
+  8e:	84 b1       	in	r24, 0x04	; 4
+  90:	95 b1       	in	r25, 0x05	; 5
+	return result;
+	result = 0;
+}
+  92:	99 27       	eor	r25, r25
+  94:	08 95       	ret
+
+00000096 <_Z13analog_read_3v>:
+//READING ANALOG VALUE FROM ADC3
+uint16_t analog_read_3(void)
+{
+	uint8_t result;
+	ADMUX = 1<<REFS0 | 1<<MUX0 | 1<<MUX1 | 0<<MUX2 | 0<<MUX3 | 0<<MUX4;
+  96:	83 e4       	ldi	r24, 0x43	; 67
+  98:	87 b9       	out	0x07, r24	; 7
+	ADCSRA |=1<<ADSC;//START CONVERSION
+  9a:	36 9a       	sbi	0x06, 6	; 6
+	while(ADCSRA & 1<<ADSC);//WAIT UNTIL CONVERSION
+  9c:	36 99       	sbic	0x06, 6	; 6
+  9e:	fe cf       	rjmp	.-4      	; 0x9c <_Z13analog_read_3v+0x6>
+	result = ADCW;//converion from 10-bit to the 8 bit data
+  a0:	84 b1       	in	r24, 0x04	; 4
+  a2:	95 b1       	in	r25, 0x05	; 5
+	return result;
+	result = 0;
+}
+  a4:	99 27       	eor	r25, r25
+  a6:	08 95       	ret
+
+000000a8 <_Z16arm_control_partv>:
+{
+	uint16_t adc_value2;
+	uint16_t adc_value3;
+	uint8_t digit;
+	// stepper motor1 control part
+	adc_value2 = analog_read_2();
+  a8:	0e 94 42 00 	call	0x84	; 0x84 <_Z13analog_read_2v>
+	if (adc_value2 < 400)
+  ac:	80 39       	cpi	r24, 0x90	; 144
+  ae:	21 e0       	ldi	r18, 0x01	; 1
+  b0:	92 07       	cpc	r25, r18
+  b2:	20 f4       	brcc	.+8      	; 0xbc <_Z16arm_control_partv+0x14>
+	{
+		digit = 0x06; //anticlockwise rotation of stepper moto1
+		usart_trans(digit);
+  b4:	86 e0       	ldi	r24, 0x06	; 6
+  b6:	0e 94 3e 00 	call	0x7c	; 0x7c <_Z11usart_transh>
+  ba:	0a c0       	rjmp	.+20     	; 0xd0 <_Z16arm_control_partv+0x28>
+	}
+	else if (adc_value2 > 700)
+  bc:	8d 3b       	cpi	r24, 0xBD	; 189
+  be:	92 40       	sbci	r25, 0x02	; 2
+  c0:	20 f0       	brcs	.+8      	; 0xca <_Z16arm_control_partv+0x22>
+	{
+		digit = 0x07;//clockwise rotation of stepper moto1
+		usart_trans(digit);
+  c2:	87 e0       	ldi	r24, 0x07	; 7
+  c4:	0e 94 3e 00 	call	0x7c	; 0x7c <_Z11usart_transh>
+  c8:	03 c0       	rjmp	.+6      	; 0xd0 <_Z16arm_control_partv+0x28>
+	}
+	else
+	{
+		digit = 0x08;//hold the motor
+		usart_trans(digit);
+  ca:	88 e0       	ldi	r24, 0x08	; 8
+  cc:	0e 94 3e 00 	call	0x7c	; 0x7c <_Z11usart_transh>
+	}
+	
+	//stepper motor 2 control part
+	adc_value3 = analog_read_3();
+  d0:	0e 94 4b 00 	call	0x96	; 0x96 <_Z13analog_read_3v>
+	if (adc_value3 < 400)
+  d4:	80 39       	cpi	r24, 0x90	; 144
+  d6:	21 e0       	ldi	r18, 0x01	; 1
+  d8:	92 07       	cpc	r25, r18
+  da:	20 f4       	brcc	.+8      	; 0xe4 <_Z16arm_control_partv+0x3c>
+	{
+		digit = 0x09; //Anticlockwise rotation of stepper moto2
+		usart_trans(digit);
+  dc:	89 e0       	ldi	r24, 0x09	; 9
+  de:	0e 94 3e 00 	call	0x7c	; 0x7c <_Z11usart_transh>
+  e2:	08 95       	ret
+	}
+	else if (adc_value3 > 700)
+  e4:	8d 3b       	cpi	r24, 0xBD	; 189
+  e6:	92 40       	sbci	r25, 0x02	; 2
+  e8:	20 f0       	brcs	.+8      	; 0xf2 <_Z16arm_control_partv+0x4a>
+	{
+		digit = 0x0A; //clockwise rotation of stepper moto2
+		usart_trans(digit);
+  ea:	8a e0       	ldi	r24, 0x0A	; 10
+  ec:	0e 94 3e 00 	call	0x7c	; 0x7c <_Z11usart_transh>
+  f0:	08 95       	ret
+	}
+	else
+	{
+		digit = 0x0B;
+		usart_trans(digit);
+  f2:	8b e0       	ldi	r24, 0x0B	; 11
+  f4:	0e 94 3e 00 	call	0x7c	; 0x7c <_Z11usart_transh>
+  f8:	08 95       	ret
+
+000000fa <main>:
+	
+}
+
+int main(void)
+{
+	DDRA = 0x00;
+  fa:	1a ba       	out	0x1a, r1	; 26
+	usart_init();
+  fc:	0e 94 36 00 	call	0x6c	; 0x6c <_Z10usart_initv>
+	while((UCSRA & 1<<UDRE)==0);
+	UDR = data;//UPLOAD THE SENDING DATA IN BUFFER
+}
+void adc_enable(void)
+{
+	ADCSRA = 1<<ADEN | 1<<ADPS1;//ADC PRESCALING 4 AND enable ADC
+ 100:	82 e8       	ldi	r24, 0x82	; 130
+ 102:	86 b9       	out	0x06, r24	; 6
+	DDRA = 0x00;
+	usart_init();
+	adc_enable();
+    while (1) 
+    {
+		arm_control_part();
+ 104:	0e 94 54 00 	call	0xa8	; 0xa8 <_Z16arm_control_partv>
+		usart_trans(digit);
+	}
+	
+}
+
+int main(void)
+ 108:	fd cf       	rjmp	.-6      	; 0x104 <main+0xa>
+
+0000010a <_exit>:
+ 10a:	f8 94       	cli
+
+0000010c <__stop_program>:
+ 10c:	ff cf       	rjmp	.-2      	; 0x10c <__stop_program>
