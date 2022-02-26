@@ -1,4 +1,4 @@
 # Atmega32
 
-Here are some simple progrms in embeded C for Atmega328p that i have done during my learnings. 
+Here are some simple programs in embeded C for Atmega328p. 
 
